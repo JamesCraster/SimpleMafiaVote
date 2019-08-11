@@ -4,8 +4,9 @@ var http = require("http").Server(app);
 var io = require("socket.io")(http);
 
 app.use(express.static("build"));
-http.listen(8000, function() {
-  console.log("Port is:" + "8000");
+let port = process.env.PORT || 8080;
+http.listen(port, function() {
+  console.log("Port is:" + port);
 });
 
 class Player {

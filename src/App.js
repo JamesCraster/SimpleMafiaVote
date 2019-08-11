@@ -16,7 +16,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      socket: io("https://mafia-votes.herokuapp.com/:8000"),
+      socket: io(),
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.reset = this.reset.bind(this);
