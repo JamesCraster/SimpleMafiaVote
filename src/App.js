@@ -1,5 +1,6 @@
 import React from "react";
 import Vote from "./Vote";
+import io from "socket.io-client";
 import {
   Input,
   Form,
@@ -15,7 +16,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      socket: socketIOClient("https://mafia-votes.herokuapp.com/:8000"),
+      socket: io("https://mafia-votes.herokuapp.com/:8000"),
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.reset = this.reset.bind(this);
