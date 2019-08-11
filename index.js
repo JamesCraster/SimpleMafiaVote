@@ -4,7 +4,7 @@ var http = require("http").Server(app);
 var io = require("socket.io")(http);
 
 app.use(express.static("build"));
-let port = process.env.PORT || 8080;
+let port = 8000;
 http.listen(port, function() {
   console.log("Port is:" + port);
 });
