@@ -15,7 +15,9 @@ import "./App.css";
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { socket: socketIOClient("localhost:8000") };
+    this.state = {
+      socket: socketIOClient("https://mafia-votes.herokuapp.com/:8000"),
+    };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.reset = this.reset.bind(this);
     this.clearVotes = this.clearVotes.bind(this);
