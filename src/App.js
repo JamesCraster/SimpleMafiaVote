@@ -9,7 +9,6 @@ import {
   TextArea,
 } from "semantic-ui-react";
 import VoteHistory from "./VoteHistory";
-import socketIOClient from "socket.io-client";
 import "./App.css";
 
 class App extends React.Component {
