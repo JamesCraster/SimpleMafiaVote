@@ -18,6 +18,7 @@ class App extends React.Component {
     this.state = { socket: socketIOClient("localhost:8000") };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.reset = this.reset.bind(this);
+    this.clearVotes = this.clearVotes.bind(this);
   }
   handleSubmit(event) {
     let data = new FormData(event.target);
@@ -27,7 +28,11 @@ class App extends React.Component {
       element.parentNode.removeChild(element);
     }
   }
-
+  clearVotes() {
+    if (window.confirm("Are you sure you want to clear votes?")) {
+      this.state.socket.emit("clearVotes");
+    }
+  }
   reset() {
     if (
       window.confirm(
@@ -43,10 +48,10 @@ class App extends React.Component {
         <br />
         <h1>Mafia Voting</h1>
         <Form id="nameForm" onSubmit={this.handleSubmit}>
-          <Label>
+          <p>
             (NB: If you've accidentally refreshed the page, just enter the same
             name again to regain control of that player)
-          </Label>
+          </p>
           <Input
             maxLength="15"
             id="name"
@@ -60,8 +65,11 @@ class App extends React.Component {
         <br />
         <VoteHistory socket={this.state.socket} />
         <br />
+        <Button onClick={this.clearVotes} color="red">
+          Clear Votes
+        </Button>
         <Button onClick={this.reset} color="red">
-          Reset
+          Reset All
         </Button>
       </div>
     );

@@ -69,4 +69,10 @@ io.on("connection", function(socket) {
     history = [];
     broadcastUpdate();
   });
+  socket.on("clearVotes", function() {
+    for (let player of players) {
+      player.voters = [];
+    }
+    broadcastUpdate();
+  });
 });
