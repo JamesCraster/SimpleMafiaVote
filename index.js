@@ -1,13 +1,15 @@
-var express = require("express");
-const app = express();
-var http = require("http").Server(app);
-var io = require("socket.io")(http);
+const express = require("express");
+const socketIO = require("socket.io");
+const path = require("path");
 
-app.use(express.static("build"));
-let port = 8000;
-http.listen(port, function() {
-  console.log("Port is:" + port);
-});
+const PORT = process.env.PORT || 3000;
+const INDEX = path.join(__dirname, "/build/index.html");
+
+const server = express()
+  .use((req, res) => res.sendFile(INDEX))
+  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+const io = socketIO(server);
 
 class Player {
   constructor(name) {
