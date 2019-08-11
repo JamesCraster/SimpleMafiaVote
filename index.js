@@ -1,7 +1,12 @@
-var app = require("http").createServer();
-var io = require("socket.io")(app);
+var express = require("express");
+const app = express();
+var http = require("http").Server(app);
+var io = require("socket.io")(http);
 
-app.listen(8000);
+app.use(express.static("build"));
+http.listen(8081, function() {
+  console.log("Port is:" + "8081");
+});
 
 class Player {
   constructor(name) {
