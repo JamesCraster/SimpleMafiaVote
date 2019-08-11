@@ -13,10 +13,16 @@ class VoteHistory extends React.Component {
   }
   render() {
     let history = [];
-    for (let i = 0; i < this.state.history.length; i++) {
+    console.log(this.state.history);
+    for (let i = 1; i <= this.state.history.length; i++) {
       history.push(
         <List.Item>
-          <span>{this.state.history[i]}</span>
+          <span style={{ float: "left" }}>
+            {this.state.history[this.state.history.length - i].time}
+          </span>
+          <span>
+            {this.state.history[this.state.history.length - i].string}
+          </span>
         </List.Item>,
       );
     }

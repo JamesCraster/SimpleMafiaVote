@@ -9,7 +9,6 @@ class Vote extends React.Component {
     };
     this.props.socket.on("updatePlayers", object => {
       this.setState({ players: object });
-      console.log(this.state.players);
     });
     this.handleVote = this.handleVote.bind(this);
   }
@@ -39,7 +38,7 @@ class Vote extends React.Component {
     }
     return (
       <div>
-        <h2>Players:</h2>
+        <h2>{`Players (${this.state.players.length}):`}</h2>
         <Segment
           style={{ width: "50%", marginLeft: "auto", marginRight: "auto" }}
         >

@@ -10,10 +10,22 @@ class Player {
   }
 }
 
+class HistoryElement {
+  constructor(string) {
+    this.string = string;
+    this.time = Date().slice(16, 21);
+  }
+}
+
 players = [];
 history = [];
+deadline = "";
 
 io.on("connection", function(socket) {
+  broadcastUpdate = () => {
+    io.emit("updatePlayers", players);
+    io.emit("updateHistory", history);
+  };
   socket.name = undefined;
   socket.emit("updatePlayers", players);
   socket.emit("updateHistory", history);
@@ -36,23 +48,25 @@ io.on("connection", function(socket) {
           }
           target.voters.push(socket.name);
           //add this to history]
-          history.push(`${socket.name} has VOTED for ${target.name}`);
+          history.push(
+            new HistoryElement(`${socket.name} has voted for ${target.name}`),
+          );
         } else {
           //current voter is trying to unvote
           target.voters = target.voters.filter(elem => elem != socket.name);
           //add this to history
-          history.push(`${socket.name} has UNVOTED for ${target.name}`);
+          history.push(
+            new HistoryElement(`${socket.name} has unvoted for ${target.name}`),
+          );
         }
-        io.emit("updatePlayers", players);
-        io.emit("updateHistory", history);
+        broadcastUpdate();
       }
     }
   });
-  socket.on("reset", function() {
+  socket.on("restart", function() {
     socket.name = undefined;
     players = [];
     history = [];
-    io.emit("updatePlayers", players);
-    io.emit("updateHistory", history);
+    broadcastUpdate();
   });
 });
