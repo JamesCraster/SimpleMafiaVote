@@ -10,6 +10,7 @@ class App extends React.Component {
     super(props);
     this.state = { socket: socketIOClient("localhost:8000") };
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.reset = this.reset.bind(this);
   }
   handleSubmit(event) {
     let data = new FormData(event.target);
@@ -17,16 +18,28 @@ class App extends React.Component {
     var element = document.getElementById("nameForm");
     element.parentNode.removeChild(element);
   }
+  reset() {
+    if (window.confirm("Are you sure you want to reset the voting?")) {
+      this.state.socket.emit("reset");
+    }
+  }
   render() {
     return (
       <div className="App">
+        <br />
         <h1>Mafia Voting</h1>
         <Form id="nameForm" onSubmit={this.handleSubmit}>
           <Input id="name" placeholder="Enter your name:" name="name" />
           <Button type="submit">{"Join"}</Button>
         </Form>
+        <br />
         <Vote socket={this.state.socket} />
+        <br />
         <VoteHistory socket={this.state.socket} />
+        <br />
+        <Button onClick={this.reset} color="red">
+          Reset
+        </Button>
       </div>
     );
   }

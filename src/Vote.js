@@ -1,5 +1,5 @@
 import React from "react";
-import { List, Button } from "semantic-ui-react";
+import { List, Segment, Button } from "semantic-ui-react";
 
 class Vote extends React.Component {
   constructor(props) {
@@ -11,6 +11,10 @@ class Vote extends React.Component {
       this.setState({ players: object });
       console.log(this.state.players);
     });
+    this.handleVote = this.handleVote.bind(this);
+  }
+  handleVote(event) {
+    this.props.socket.emit("vote", event.target.getAttribute("data-player"));
   }
   render() {
     let listItems = [];
@@ -18,8 +22,17 @@ class Vote extends React.Component {
     for (let i = 0; i < this.state.players.length; i++) {
       listItems.push(
         <List.Item key={key}>
-          {this.state.players[i].name}
-          <Button>{"Vote"}</Button>
+          {`${this.state.players[i].name} - (${
+            this.state.players[i].voters.length
+          }) ${this.state.players[i].voters.join(", ")}`}
+          <Button
+            data-player={this.state.players[i].name}
+            size="small"
+            onClick={this.handleVote}
+            style={{ marginLeft: "15px" }}
+          >
+            {"Vote"}
+          </Button>
         </List.Item>,
       );
       key++;
@@ -27,7 +40,11 @@ class Vote extends React.Component {
     return (
       <div>
         <h2>Players:</h2>
-        <List bulleted>{listItems}</List>
+        <Segment
+          style={{ width: "50%", marginLeft: "auto", marginRight: "auto" }}
+        >
+          <List>{listItems}</List>
+        </Segment>
       </div>
     );
   }

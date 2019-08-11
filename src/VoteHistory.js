@@ -1,5 +1,5 @@
 import React from "react";
-import { List, Button, ListItem } from "semantic-ui-react";
+import { List, Button, Segment, ListItem } from "semantic-ui-react";
 
 class VoteHistory extends React.Component {
   constructor(props) {
@@ -7,6 +7,9 @@ class VoteHistory extends React.Component {
     this.state = {
       history: [],
     };
+    this.props.socket.on("updateHistory", history => {
+      this.setState({ history: history });
+    });
   }
   render() {
     let history = [];
@@ -20,10 +23,22 @@ class VoteHistory extends React.Component {
     return (
       <div>
         <h2>Voting history:</h2>
-        <List bulleted>
-          <ListItem>{"This is the beginning of the voting history"}</ListItem>
-          {history}
-        </List>
+        <Segment
+          style={{
+            width: "50%",
+            marginLeft: "auto",
+            marginRight: "auto",
+            height: "300px",
+            overflow: "auto",
+          }}
+        >
+          <List>
+            {history}
+            <ListItem style={{ fontStyle: "italic" }}>
+              {"This is the beginning of the voting history"}
+            </ListItem>
+          </List>
+        </Segment>
       </div>
     );
   }
