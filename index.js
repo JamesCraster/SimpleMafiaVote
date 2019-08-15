@@ -1,15 +1,13 @@
-const express = require("express");
-const socketIO = require("socket.io");
-const path = require("path");
+var express = require("express");
+const app = express();
+var http = require("http").Server(app);
+var io = require("socket.io")(http);
 
-const PORT = process.env.PORT || 3000;
-const INDEX = path.join(__dirname, "/build/index.html");
-
-const server = express()
-  .use((req, res) => res.sendFile(INDEX))
-  .listen(PORT, () => console.log(`Listening on ${PORT}`));
-
-const io = socketIO(server);
+app.use(express.static("build"));
+let port = 8000;
+http.listen(port, function() {
+  console.log("Port is:" + port);
+});
 
 class Player {
   constructor(name) {
@@ -57,14 +55,22 @@ io.on("connection", function(socket) {
           target.voters.push(socket.name);
           //add this to history]
           history.push(
-            new HistoryElement(`${socket.name} has voted for ${target.name}`),
+            new HistoryElement(
+              `${socket.name} has voted for ${target.name} (${
+                target.voters.length
+              })`,
+            ),
           );
         } else {
           //current voter is trying to unvote
           target.voters = target.voters.filter(elem => elem != socket.name);
           //add this to history
           history.push(
-            new HistoryElement(`${socket.name} has unvoted for ${target.name}`),
+            new HistoryElement(
+              `${socket.name} has unvoted for ${target.name} (${
+                target.voters.length
+              })`,
+            ),
           );
         }
         broadcastUpdate();
