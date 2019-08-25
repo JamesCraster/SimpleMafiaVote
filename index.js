@@ -5,7 +5,7 @@ var io = require("socket.io")(http);
 
 app.use(express.static("build"));
 let port = 8000;
-http.listen(port, function() {
+http.listen(port, function () {
   console.log("Port is:" + port);
 });
 
@@ -13,6 +13,7 @@ class Player {
   constructor(name) {
     this.name = name;
     this.voters = [];
+    this.dead = false;
   }
 }
 
@@ -27,7 +28,7 @@ players = [];
 history = [];
 deadline = "";
 
-io.on("connection", function(socket) {
+io.on("connection", function (socket) {
   broadcastUpdate = () => {
     io.emit("updatePlayers", players);
     io.emit("updateHistory", history);
@@ -35,14 +36,22 @@ io.on("connection", function(socket) {
   socket.name = undefined;
   socket.emit("updatePlayers", players);
   socket.emit("updateHistory", history);
-  socket.on("addPlayer", function(name) {
+  socket.on("addPlayer", function (name) {
     if (players.filter(elem => elem.name == name).length == 0) {
       players.push(new Player(name));
       io.emit("updatePlayers", players);
     }
     socket.name = name;
   });
-  socket.on("vote", function(name) {
+  socket.on('toggleDead', function (name) {
+    let target = players.find(elem => elem.name == name);
+    if (target) {
+      target.dead = !target.dead;
+      target.voters = [];
+    }
+    broadcastUpdate();
+  })
+  socket.on("vote", function (name) {
     if (socket.name != undefined) {
       let target = players.find(elem => elem.name == name);
       if (target) {
@@ -57,7 +66,7 @@ io.on("connection", function(socket) {
           history.push(
             new HistoryElement(
               `${socket.name} has voted for ${target.name} (${
-                target.voters.length
+              target.voters.length
               })`,
             ),
           );
@@ -68,7 +77,7 @@ io.on("connection", function(socket) {
           history.push(
             new HistoryElement(
               `${socket.name} has unvoted for ${target.name} (${
-                target.voters.length
+              target.voters.length
               })`,
             ),
           );
@@ -77,16 +86,21 @@ io.on("connection", function(socket) {
       }
     }
   });
-  socket.on("restart", function() {
+  socket.on("restart", function () {
     socket.name = undefined;
     players = [];
     history = [];
     broadcastUpdate();
   });
-  socket.on("clearVotes", function() {
+  socket.on("clearVotes", function () {
     for (let player of players) {
       player.voters = [];
     }
+    history.push(
+      new HistoryElement(
+        "The votes have been reset",
+      ),
+    );
     broadcastUpdate();
   });
 });
