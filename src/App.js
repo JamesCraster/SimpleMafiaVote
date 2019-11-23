@@ -8,26 +8,40 @@ import {
   Header,
   Label,
   TextArea,
+  Dimmer,
+  Segment,
 } from "semantic-ui-react";
 import VoteHistory from "./VoteHistory";
 import "./App.css";
-
+window.socket = io();
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      socket: io(),
+      socket: window.socket,
+      inRoom: false,
+      named: false,
     };
+    this.handleRoomSubmit = this.handleRoomSubmit.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.reset = this.reset.bind(this);
     this.clearVotes = this.clearVotes.bind(this);
+    this.state.socket.on("enterRoom", function() {
+      this.setState({ inRoom: "true" });
+    });
   }
   handleSubmit(event) {
     let data = new FormData(event.target);
     if (data.get("name").length != 0) {
       this.state.socket.emit("addPlayer", data.get("name"));
       var element = document.getElementById("nameForm");
-      element.parentNode.removeChild(element);
+      element.style.display = "none";
+    }
+  }
+  handleRoomSubmit(event) {
+    let data = new FormData(event.target);
+    if (data.get("room").length != 0) {
+      this.state.socket.emit("enterRoom", data.get("room"));
     }
   }
   clearVotes() {
@@ -49,30 +63,54 @@ class App extends React.Component {
       <div className="App">
         <br />
         <h1>Mafia Voting</h1>
-        <Form id="nameForm" onSubmit={this.handleSubmit}>
-          <p>
-            (NB: If you've accidentally refreshed the page, just enter the same
-            name again to regain control of that player)
-          </p>
+        <Button color="blue" type="submit">
+          {"Create Room"}
+        </Button>
+        <br></br>
+        <br></br>
+        <Form
+          id="roomForm"
+          onSubmit={this.handleRoomSubmit}
+          style={{ display: this.state.inRoom ? "none" : "default" }}
+        >
           <Input
-            maxLength="15"
-            id="name"
-            placeholder="Enter your name:"
-            name="name"
-          />
+            maxLength="5"
+            name="room"
+            placeholder="Enter room code"
+          ></Input>
           <Button type="submit">{"Join"}</Button>
         </Form>
-        <br />
-        <Vote socket={this.state.socket} />
-        <br />
-        <VoteHistory socket={this.state.socket} />
-        <br />
-        <Button onClick={this.clearVotes} color="red">
-          Clear Votes
-        </Button>
-        <Button onClick={this.reset} color="red">
-          Reset All
-        </Button>
+        <Dimmer.Dimmable dimmed={!this.state.inRoom}>
+          <Dimmer active={!this.state.inRoom} inverted></Dimmer>
+          <Form
+            id="nameForm"
+            onSubmit={this.handleSubmit}
+            style={{ display: this.state.named ? "none" : "default" }}
+          >
+            <p>
+              (NB: If you've accidentally refreshed the page, just enter the
+              same name again to regain control of that player)
+            </p>
+            <Input
+              maxLength="15"
+              id="name"
+              placeholder="Enter your name:"
+              name="name"
+            />
+            <Button type="submit">{"Join"}</Button>
+          </Form>
+          <br />
+          <Vote socket={this.state.socket} />
+          <br />
+          <VoteHistory socket={this.state.socket} />
+          <br />
+          <Button onClick={this.clearVotes} color="red">
+            Clear Votes
+          </Button>
+          <Button onClick={this.reset} color="red">
+            Reset All
+          </Button>
+        </Dimmer.Dimmable>
       </div>
     );
   }
