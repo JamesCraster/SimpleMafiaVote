@@ -1,5 +1,5 @@
 import React from "react";
-import { List, Segment, Button } from "semantic-ui-react";
+import { List, Segment, Button, Icon } from "semantic-ui-react";
 
 class Vote extends React.Component {
   constructor(props) {
@@ -11,6 +11,10 @@ class Vote extends React.Component {
       this.setState({ players: object });
     });
     this.handleVote = this.handleVote.bind(this);
+    this.handleDead = this.handleDead.bind(this);
+  }
+  handleDead(event) {
+    this.props.socket.emit("toggleDead", event.target.getAttribute("data-player"));
   }
   handleVote(event) {
     this.props.socket.emit("vote", event.target.getAttribute("data-player"));
@@ -21,14 +25,19 @@ class Vote extends React.Component {
     for (let i = 0; i < this.state.players.length; i++) {
       listItems.push(
         <List.Item key={key}>
-          {`${this.state.players[i].name} - (${
-            this.state.players[i].voters.length
-          }) ${this.state.players[i].voters.join(", ")}`}
-          <Button
+          <Button data-player={this.state.players[i].name} size="small" style={{ float: "left" }} onClick={this.handleDead}>
+            {'Toggle Dead'}
+          </Button>
+          <span style={{ textDecoration: this.state.players[i].dead ? "line-through" : "none" }}>
+            {`${this.state.players[i].name} - (${
+              this.state.players[i].voters.length
+              }) ${this.state.players[i].voters.join(", ")}`}
+          </span>
+
+          <Button style={{ visibility: this.state.players[i].dead ? "hidden" : "visible", marginLeft: "15px", marginRight: "100px" }}
             data-player={this.state.players[i].name}
             size="small"
             onClick={this.handleVote}
-            style={{ marginLeft: "15px" }}
           >
             {"Vote"}
           </Button>
