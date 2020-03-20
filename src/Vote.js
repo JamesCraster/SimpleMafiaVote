@@ -29,9 +29,12 @@ class Vote extends React.Component {
             {'Toggle Dead'}
           </Button>
           <span style={{ textDecoration: this.state.players[i].dead ? "line-through" : "none" }}>
-            {`${this.state.players[i].name} - (${
-              this.state.players[i].voters.length
-              }) ${this.state.players[i].voters.join(", ")}`}
+            {
+              this.state.players[i].dead ? `${this.state.players[i].name} - (${
+                this.state.players[i].deadVoters.length
+                }) ${this.state.players[i].deadVoters.join(", ")}` : `${this.state.players[i].name} - (${
+                this.state.players[i].voters.length
+                }) ${this.state.players[i].voters.join(", ")}`}
           </span>
 
           <Button style={{ visibility: this.state.players[i].dead ? "hidden" : "visible", marginLeft: "15px", marginRight: "100px" }}
@@ -47,7 +50,7 @@ class Vote extends React.Component {
     }
     return (
       <div>
-        <h2>{`Players (${this.state.players.length}):`}</h2>
+        <h2>{`Players (${this.state.players.filter(elem => !elem.dead).length}):`}</h2>
         <Segment
           style={{ width: "50%", marginLeft: "auto", marginRight: "auto" }}
         >

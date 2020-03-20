@@ -13,6 +13,7 @@ class Player {
   constructor(name) {
     this.name = name;
     this.voters = [];
+    this.deadVoters = [];
     this.dead = false;
   }
 }
@@ -47,7 +48,11 @@ io.on("connection", function (socket) {
     let target = players.find(elem => elem.name == name);
     if (target) {
       target.dead = !target.dead;
-      target.voters = [];
+      if (target.voters === []) {
+        target.voters = target.deadVoters;
+      } else {
+        target.deadVoters = target.voters
+      }
     }
     broadcastUpdate();
   })
@@ -67,7 +72,7 @@ io.on("connection", function (socket) {
             new HistoryElement(
               `${socket.name} has voted for ${target.name} (${
               target.voters.length
-              })`,
+              }${target.voters.length > 0 ? ", " + target.voters.join(",") : ""})`,
             ),
           );
         } else {
@@ -78,7 +83,7 @@ io.on("connection", function (socket) {
             new HistoryElement(
               `${socket.name} has unvoted for ${target.name} (${
               target.voters.length
-              })`,
+              }${target.voters.length > 0 ? "," + target.voters.join(",") : ""})`,
             ),
           );
         }
