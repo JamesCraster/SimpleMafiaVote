@@ -31,7 +31,7 @@ class VoteHistory extends React.Component {
         <h2>Voting history:</h2>
         <Segment
           style={{
-            width: "50%",
+            width: "90%",
             marginLeft: "auto",
             marginRight: "auto",
             height: "300px",

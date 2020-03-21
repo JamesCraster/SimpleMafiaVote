@@ -98,6 +98,14 @@ io.on("connection", function (socket) {
     io.emit("restart");
     broadcastUpdate();
   });
+  socket.on("delete", function (player) {
+    console.log("delete received");
+    console.log(player);
+    console.log(players);
+    players = players.filter(elem => elem.name !== player);
+    console.log(players);
+    broadcastUpdate();
+  });
   socket.on("clearVotes", function () {
     for (let player of players) {
       player.voters = [];

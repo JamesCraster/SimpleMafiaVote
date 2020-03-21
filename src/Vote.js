@@ -12,6 +12,19 @@ class Vote extends React.Component {
     });
     this.handleVote = this.handleVote.bind(this);
     this.handleDead = this.handleDead.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+  }
+  handleDelete(event) {
+    console.log(event);
+    if (
+      window.confirm(
+        "Are you sure you want to delete this player?",
+      )
+    ) {
+      this.props.socket.emit("delete", event.target.getAttribute("data-player"));
+      console.log('delete sent');
+    }
+
   }
   handleDead(event) {
     this.props.socket.emit("toggleDead", event.target.getAttribute("data-player"));
@@ -25,8 +38,11 @@ class Vote extends React.Component {
     for (let i = 0; i < this.state.players.length; i++) {
       listItems.push(
         <List.Item key={key}>
+          <Button data-player={this.state.players[i].name} size="small" style={{ float: "left" }} onClick={this.handleDelete} color="red" icon>
+            <Icon data-player={this.state.players[i].name} name='delete'></Icon>
+          </Button>
           <Button data-player={this.state.players[i].name} size="small" style={{ float: "left" }} onClick={this.handleDead}>
-            {'Toggle Dead'}
+            {this.state.players[i].dead ? 'Alive' : 'Dead'}
           </Button>
           <span style={{ textDecoration: this.state.players[i].dead ? "line-through" : "none" }}>
             {
@@ -52,7 +68,7 @@ class Vote extends React.Component {
       <div>
         <h2>{`Players (${this.state.players.filter(elem => !elem.dead).length}):`}</h2>
         <Segment
-          style={{ width: "50%", marginLeft: "auto", marginRight: "auto" }}
+          style={{ width: "90%", marginLeft: "auto", marginRight: "auto" }}
         >
           <List>{listItems}</List>
         </Segment>
