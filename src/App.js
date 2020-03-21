@@ -21,6 +21,10 @@ class App extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.reset = this.reset.bind(this);
     this.clearVotes = this.clearVotes.bind(this);
+    this.state.socket.on("restart", function () {
+      console.log("reload");
+      window.location.reload(true);
+    })
   }
   handleSubmit(event) {
     let data = new FormData(event.target);

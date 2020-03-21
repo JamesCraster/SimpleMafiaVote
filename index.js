@@ -95,6 +95,7 @@ io.on("connection", function (socket) {
     socket.name = undefined;
     players = [];
     history = [];
+    io.emit("restart");
     broadcastUpdate();
   });
   socket.on("clearVotes", function () {
