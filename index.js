@@ -53,6 +53,11 @@ io.on("connection", function (socket) {
       } else {
         target.deadVoters = target.voters
       }
+      if (target.dead) {
+        players.forEach(player =>
+          player.voters = player.voters.filter(voter => voter !== target.name)
+        );
+      }
     }
     broadcastUpdate();
   })
@@ -98,11 +103,14 @@ io.on("connection", function (socket) {
     io.emit("restart");
     broadcastUpdate();
   });
-  socket.on("delete", function (player) {
+  socket.on("delete", function (target) {
     console.log("delete received");
-    console.log(player);
+    console.log(target);
     console.log(players);
-    players = players.filter(elem => elem.name !== player);
+    players = players.filter(elem => elem.name !== target);
+    players.forEach(player =>
+      player.voters = player.voters.filter(voter => voter !== target)
+    );
     console.log(players);
     broadcastUpdate();
   });
