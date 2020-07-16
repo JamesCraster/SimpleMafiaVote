@@ -25,6 +25,7 @@ class HistoryElement {
   }
 }
 
+roles = ["N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"];
 players = [];
 history = [];
 deadline = "";
@@ -33,6 +34,7 @@ io.on("connection", function (socket) {
   broadcastUpdate = () => {
     io.emit("updatePlayers", players);
     io.emit("updateHistory", history);
+    io.to("moderator").emit('updateModerator', players.map((player, index) => `${player.name} - ${roles[index]}`));
   };
   socket.name = undefined;
   socket.emit("updatePlayers", players);
@@ -41,8 +43,13 @@ io.on("connection", function (socket) {
     if (players.filter(elem => elem.name == name).length == 0) {
       players.push(new Player(name));
       io.emit("updatePlayers", players);
+      socket.emit("giveRole", roles[players.length - 1]);
+    } else {
+      console.log()
+      socket.emit("giveRole", roles[players.indexOf(players.filter(elem => elem.name == name)[0])]);
     }
     socket.name = name;
+    broadcastUpdate();
   });
   socket.on('toggleDead', function (name) {
     let target = players.find(elem => elem.name == name);
@@ -60,6 +67,13 @@ io.on("connection", function (socket) {
       }
     }
     broadcastUpdate();
+  })
+  socket.on("moderator", () => {
+    //this is the moderator looking to connect
+    socket.join('moderator');
+  })
+  socket.on("updateRoles", (newRoles) => {
+    roles = newRoles;
   })
   socket.on("vote", function (name) {
     if (socket.name != undefined) {

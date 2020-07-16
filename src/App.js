@@ -17,6 +17,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       socket: io('localhost:8000'),
+      role: "not assigned yet"
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.reset = this.reset.bind(this);
@@ -24,6 +25,10 @@ class App extends React.Component {
     this.state.socket.on("restart", function () {
       console.log("reload");
       window.location.reload(true);
+    })
+    let component = this
+    this.state.socket.on("giveRole", function (newRole) {
+      component.setState({ role: newRole });
     })
   }
   handleSubmit(event) {
@@ -66,6 +71,8 @@ class App extends React.Component {
           />
           <Button type="submit">{"Join"}</Button>
         </Form>
+        <br></br>
+        <p>Your role is {this.state.role}</p>
         <br />
         <Vote socket={this.state.socket} />
         <br />
