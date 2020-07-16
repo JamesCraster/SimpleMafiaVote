@@ -16,7 +16,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      socket: io('localhost:8000'),
+      socket: io('http://206.189.29.229:8000/'),
       role: "not assigned yet"
     };
     this.handleSubmit = this.handleSubmit.bind(this);

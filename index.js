@@ -1,9 +1,13 @@
 var express = require("express");
 const app = express();
+const path=require('path');
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
 
 app.use(express.static("build"));
+app.get("/*", function(req,res){
+	res.sendFile(path.join(__dirname,'build','index.html'));
+});
 let port = 8000;
 http.listen(port, function () {
   console.log("Port is:" + port);
