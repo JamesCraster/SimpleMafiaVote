@@ -16,20 +16,21 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      socket: io('http://206.189.29.229:8000/'),
-      role: "not assigned yet"
+      socket: io("localhost:8000"),
+      role: "not assigned yet",
     };
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleDiscard = this.handleDiscard.bind(this);
     this.reset = this.reset.bind(this);
     this.clearVotes = this.clearVotes.bind(this);
     this.state.socket.on("restart", function () {
       console.log("reload");
       window.location.reload(true);
-    })
-    let component = this
+    });
+    let component = this;
     this.state.socket.on("giveRole", function (newRole) {
       component.setState({ role: newRole });
-    })
+    });
   }
   handleSubmit(event) {
     let data = new FormData(event.target);
@@ -53,7 +54,26 @@ class App extends React.Component {
       this.state.socket.emit("restart");
     }
   }
+  handleDiscard(event) {
+    this.state.socket.emit("discard", event.target.getAttribute("data-role"));
+  }
   render() {
+    let role = this.state.role;
+    if (this.state.role.includes("OR")) {
+      role = (
+        <div>
+          <span>{this.state.role.split("OR")[0]}</span>
+          <Button data-role={0} onClick={this.handleDiscard}>
+            Discard
+          </Button>
+          <span>OR</span>
+          <span>{this.state.role.split("OR")[1]}</span>
+          <Button data-role={1} onClick={this.handleDiscard}>
+            Discard
+          </Button>
+        </div>
+      );
+    }
     return (
       <div className="App">
         <br />
@@ -72,7 +92,7 @@ class App extends React.Component {
           <Button type="submit">{"Join"}</Button>
         </Form>
         <br></br>
-        <p>Your role is {this.state.role}</p>
+        <span>Your role is: {role}</span>
         <br />
         <Vote socket={this.state.socket} />
         <br />
