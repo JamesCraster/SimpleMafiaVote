@@ -42,7 +42,7 @@ class Moderator extends React.Component {
   render() {
     return (
       <div className="App">
-        <br></br>
+        <br/>
         <h1>This is the moderation area.</h1>
         <p>
           NOTE: Carefully comma-separate your roles, otherwise the server will
@@ -50,7 +50,7 @@ class Moderator extends React.Component {
         </p>
         <Button onClick={this.handleGreaterIdea}>Greater Idea</Button>
         <Form onSubmit={this.handleSubmit}>
-          <Input name="roles" placeholder="Enter comma-separated roles"></Input>
+          <Input name="roles" placeholder="Enter comma-separated roles"/>
         </Form>
         <p>Players:</p>
         <ul>

@@ -39,7 +39,7 @@ class Vote extends React.Component {
       listItems.push(
         <List.Item key={key}>
           <Button data-player={this.state.players[i].name} size="small" style={{ float: "left" }} onClick={this.handleDelete} color="red" icon>
-            <Icon data-player={this.state.players[i].name} name='delete'></Icon>
+            <Icon data-player={this.state.players[i].name} name='delete'/>
           </Button>
           <Button data-player={this.state.players[i].name} size="small" style={{ float: "left" }} onClick={this.handleDead}>
             {this.state.players[i].dead ? 'Alive' : 'Dead'}

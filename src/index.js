@@ -11,13 +11,13 @@ let routes = (
   <BrowserRouter>
     <Switch>
       <Route path="/discards">
-        <GreaterIdea></GreaterIdea>
+        <GreaterIdea/>
       </Route>
       <Route path="/moderator">
-        <Moderator></Moderator>
+        <Moderator/>
       </Route>
       <Route path="/">
-        <App></App>
+        <App/>
       </Route>
     </Switch>
   </BrowserRouter>

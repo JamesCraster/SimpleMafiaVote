@@ -128,26 +128,7 @@ io.on("connection", function (socket) {
     for (let i = 0; i < 10; i++) {
       roles.push("N/A");
     }
-    discards = [
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-    ];
+    discards = Array(maxNumberOfPlayers).fill("N/A");
     for (let player of players) {
       io.to(player.socket).emit(
         "giveRole",
@@ -220,46 +201,8 @@ io.on("connection", function (socket) {
     socket.name = undefined;
     players = [];
     messageHistory = [];
-    roles = [
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-    ];
-    discards = [
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-      "N/A",
-    ];
+    roles = Array(maxNumberOfPlayers).fill("N/A");
+    discards = Array(maxNumberOfPlayers).fill("N/A");
     io.emit("restart");
     broadcastUpdate();
   });

@@ -25,7 +25,7 @@ class GreaterIdea extends React.Component {
   render() {
     return (
       <div className="App">
-        <br></br>
+        <br/>
         <h1>Greater idea</h1>
         <p>Discards:</p>
         <ul>
