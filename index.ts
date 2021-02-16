@@ -45,8 +45,8 @@ class MessageHistoryElement {
 const maxNumberOfPlayers = 18;
 let roles = Array(maxNumberOfPlayers).fill("N/A");
 let discards = Array(maxNumberOfPlayers).fill("N/A");
-let players = [];
-let messageHistory = [];
+let players: Player[] = [];
+let messageHistory: MessageHistoryElement[] = [];
 
 io.on("connection", function (socket) {
   const broadcastUpdate = (name?: string) => {
