@@ -1,20 +1,30 @@
+import { Socket } from "socket.io";
+
 var express = require("express");
 const app = express();
 const path = require("path");
 var http = require("http").Server(app);
-var io = require("socket.io")(http);
+//@ts-ignore
+const io = require("socket.io")(http);
 
 app.use(express.static("build"));
 app.get("/*", function (req, res) {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
-let port = 8000;
+
+const port = 8000;
+
 http.listen(port, function () {
   console.log("Port is:" + port);
 });
 
 class Player {
-  constructor(name, socket) {
+  public name: string;
+  public voters: string[];
+  public deadVoters: string[];
+  public dead: boolean;
+  public socket: Socket;
+  constructor(name: string, socket: Socket) {
     this.name = name;
     this.voters = [];
     this.deadVoters = [];
@@ -23,57 +33,23 @@ class Player {
   }
 }
 
-class HistoryElement {
-  constructor(string) {
-    this.string = string;
+class MessageHistoryElement {
+  public message: string;
+  public time: string;
+  constructor(message: string) {
+    this.message = message;
     this.time = Date().slice(16, 21);
   }
 }
-roles = [
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-];
-discards = [
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-  "N/A",
-];
-players = [];
-history = [];
-deadline = "";
+
+const maxNumberOfPlayers = 18;
+let roles = Array(maxNumberOfPlayers).fill("N/A");
+let discards = Array(maxNumberOfPlayers).fill("N/A");
+let players = [];
+let messageHistory = [];
+
 io.on("connection", function (socket) {
-  broadcastUpdate = (name) => {
+  const broadcastUpdate = (name?: string) => {
     io.emit("updatePlayers", players);
     io.emit("updateHistory", history);
     io.emit(
@@ -93,13 +69,13 @@ io.on("connection", function (socket) {
   socket.emit("updatePlayers", players);
   socket.emit("updateHistory", history);
   socket.on("addPlayer", function (name) {
-    if (players.filter((elem) => elem.name == name).length == 0) {
+    if (players.filter((elem) => elem.name === name).length === 0) {
       players.push(new Player(name, socket.id));
       io.emit("updatePlayers", players);
       socket.emit("giveRole", roles[players.length - 1]);
     } else {
       console.log();
-      players.filter((elem) => elem.name == name)[0].socket = socket.id;
+      players.filter((elem) => elem.name === name)[0].socket = socket.id;
       socket.emit(
         "giveRole",
         roles[players.indexOf(players.filter((elem) => elem.name == name)[0])],
@@ -131,7 +107,7 @@ io.on("connection", function (socket) {
   socket.on("updateRoles", (newRoles) => {
     console.log("updated roles");
     roles = newRoles;
-    for (player of players) {
+    for (let player of players) {
       io.to(player.socket).emit(
         "giveRole",
         roles[
@@ -149,7 +125,7 @@ io.on("connection", function (socket) {
         greaterRoles[Math.floor(Math.random() * greaterRoles.length)]
       } OR ${greaterRoles[Math.floor(Math.random() * greaterRoles.length)]}`;
     });
-    for (i = 0; i < 10; i++) {
+    for (let i = 0; i < 10; i++) {
       roles.push("N/A");
     }
     discards = [
@@ -172,7 +148,7 @@ io.on("connection", function (socket) {
       "N/A",
       "N/A",
     ];
-    for (player of players) {
+    for (let player of players) {
       io.to(player.socket).emit(
         "giveRole",
         roles[
@@ -187,12 +163,12 @@ io.on("connection", function (socket) {
       players.indexOf(players.filter((elem) => elem.socket == socket.id)[0])
     ] = roles[
       players.indexOf(players.filter((elem) => elem.socket == socket.id)[0])
-    ].split("OR")[number == 0 ? 0 : 1];
+    ].split("OR")[number === 0 ? 0 : 1];
     roles[
       players.indexOf(players.filter((elem) => elem.socket == socket.id)[0])
     ] = roles[
       players.indexOf(players.filter((elem) => elem.socket == socket.id)[0])
-    ].split("OR")[number == 0 ? 1 : 0];
+    ].split("OR")[number === 0 ? 1 : 0];
     socket.emit(
       "giveRole",
       roles[
@@ -213,8 +189,8 @@ io.on("connection", function (socket) {
           }
           target.voters.push(socket.name);
           //add this to history
-          history.push(
-            new HistoryElement(
+          messageHistory.push(
+            new MessageHistoryElement(
               `${socket.name} has voted for ${target.name} (${
                 target.voters.length
               }${
@@ -226,8 +202,8 @@ io.on("connection", function (socket) {
           //current voter is trying to unvote
           target.voters = target.voters.filter((elem) => elem != socket.name);
           //add this to history
-          history.push(
-            new HistoryElement(
+          messageHistory.push(
+            new MessageHistoryElement(
               `${socket.name} has unvoted for ${target.name} (${
                 target.voters.length
               }${
@@ -243,7 +219,7 @@ io.on("connection", function (socket) {
   socket.on("restart", function () {
     socket.name = undefined;
     players = [];
-    history = [];
+    messageHistory = [];
     roles = [
       "N/A",
       "N/A",
@@ -303,11 +279,12 @@ io.on("connection", function (socket) {
     for (let player of players) {
       player.voters = [];
     }
-    history.push(new HistoryElement("The votes have been reset"));
+    messageHistory.push(new MessageHistoryElement("The votes have been reset"));
     broadcastUpdate();
   });
 });
-greaterRoles = `Vanilla Townie
+
+const greaterRoles = `Vanilla Townie
 Vanilla Townie
 Vanilla Townie
 Vanilla Townie
